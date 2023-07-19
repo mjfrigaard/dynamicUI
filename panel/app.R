@@ -19,7 +19,7 @@ app_ui <- function(request) {
       dark = NULL,
       bs4Dash::dashboardHeader(
         title = bs4Dash::dashboardBrand(
-          title = span("MRCT App (dev)", style = "color:#f36633"),
+          title = span("MRCT App (panels)", style = "color:#f36633"),
           color = "white",
           href = "",
           image = "shiny.png",
@@ -39,23 +39,10 @@ app_ui <- function(request) {
             tabName = "overview"
           ),
           # Step 1: gen_sample ----
-          bs4Dash::menuItem("Get started",
+          bs4Dash::menuItem("Sample & Distributions",
             tabName = "gen_sample"
           ),
-          # Step 2: Distributions ----
-          bs4Dash::menuItem("Distribution (select one)",
-            tabName = "dist",
-            bs4Dash::menuSubItem("Binomial",
-              tabName = "binomial"
-            ),
-            bs4Dash::menuSubItem("Normal",
-              tabName = "normal"
-            ),
-            bs4Dash::menuSubItem("Negative Binomial",
-              tabName = "neg_binom"
-            )
-          ),
-          # Step 3: Randomization ----
+          # Step 2: Randomization ----
           bs4Dash::menuItem("Randomization",
             tabName = "random"
           ),
@@ -69,6 +56,7 @@ app_ui <- function(request) {
           )
         )
       ),
+# body --------------------------------------------------------------------
       bs4Dash::dashboardBody(
         shinyjs::useShinyjs(),
         shinyjs::extendShinyjs(
@@ -82,17 +70,17 @@ app_ui <- function(request) {
           # intro tab ----
           bs4Dash::tabItem(
             tabName = "intro",
-            tags$h3(tags$em("<Intro tab>")),
-            tags$img(
-              src = "dist_options.png",
-              height = "100%",
-              width = "100%"
-            )
+            tags$h3(tags$em("<Intro tab>"))
           ),
           # intro sub-item (overview) ----
           bs4Dash::tabItem(
             tabName = "overview",
             tags$h2("<Overview tab>"),
+            tags$img(
+              src = "dist_options.png",
+              height = "100%",
+              width = "100%"
+            ),
             tags$img(
               src = "more_info.png",
               height = "100%",
@@ -102,34 +90,84 @@ app_ui <- function(request) {
           # gen_sample the data (gen_sample) ----
           bs4Dash::tabItem(
             tabName = "gen_sample",
-            tags$h2("Generate samples"),
-            shiny::br(),
-            mod_gen_sample_ui("samples")
-          ),
-          bs4Dash::tabItem(
-            tabName = "dist",
-            tags$h2("Selecting Distributions"),
-            shiny::strong("Please select one of the distributions below"),
-            shiny::br(),
-          ),
-          bs4Dash::tabItem(
-            tabName = "binomial",
-            tags$h2("Binomial Distribution"),
-            shiny::br(),
-            mod_binomial_ui(id = "binom")
-          ),
-          bs4Dash::tabItem(
-            tabName = "normal",
-            tags$h2("Normal Distribution"),
-            shiny::br(),
-            mod_normal_ui(id = "norm")
-          ),
-          bs4Dash::tabItem(
-            tabName = "neg_binom",
-            tags$h2("Negative Binomial Distribution"),
-            shiny::br(),
-            mod_neg_binom_ui(id = "neg_binom")
-          ),
+            mod_gen_sample_ui("samples"),
+            shiny::br(), 
+            fluidRow(
+            shiny::column(width = 12,
+            tags$h2("Distributions"))),
+            shiny::br(), 
+            fluidRow(
+            shiny::column(width = 12,
+            shiny::h4("Please select one of the distributions below"))),
+            shiny::br(), 
+            fluidRow(
+            shiny::column(
+              width = 4,
+              shiny::checkboxInput(
+                        inputId = "binom_dist",
+                        label = "Binomial Distribution",
+                        value = FALSE
+                      )
+              ),
+              shiny::column(
+                width = 4,
+              shiny::checkboxInput(
+                        inputId = "norm_dist",
+                        label = "Normal Distribution",
+                        value = FALSE
+                      )
+                ),
+              shiny::column(width = 4,
+              shiny::checkboxInput(
+                        inputId = "neg_binom_dist",
+                        label = "Negative Binomial Distribution",
+                        value = FALSE
+                      )
+                  ),
+              ),
+          shiny::conditionalPanel(
+            condition = "input.binom_dist == true",
+            shiny::fluidRow(
+            shiny::column(
+              width = 12,
+              mod_binomial_ui(id = "binom"))
+              )
+            ),
+          shiny::conditionalPanel(
+            condition = "input.norm_dist == true",
+            shiny::fluidRow(
+            shiny::column(
+              width = 12,
+              mod_normal_ui(id = "norm"))
+              )
+            ),
+          shiny::conditionalPanel(
+            condition = "input.neg_binom_dist == true",
+            shiny::fluidRow(
+            shiny::column(
+              width = 12,
+              mod_neg_binom_ui(id = "neg_binom"))
+              )
+            )
+            ),
+          # bs4Dash::tabItem(
+          #   tabName = "binomial",
+          #   tags$h2("Binomial Distribution"),
+          #   shiny::br(),
+          #   mod_binomial_ui(id = "binom")
+          # ),
+          # bs4Dash::tabItem(
+          #   tabName = "normal",
+          #   tags$h2("Normal Distribution"),
+          #   shiny::br(),
+          #   mod_normal_ui(id = "norm")
+          # ),
+          # bs4Dash::tabItem(
+          #   tabName = "neg_binom",
+          #   tags$h2("Negative Binomial Distribution"),
+          #   shiny::br(),
+          #   mod_neg_binom_ui(id = "neg_binom")
+          # ),
           bs4Dash::tabItem(
             tabName = "random",
             tags$h2("Randomization"),
